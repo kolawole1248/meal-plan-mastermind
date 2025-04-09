@@ -1,79 +1,69 @@
 
+// Helper functions for localStorage access
+
 import { Recipe } from "@/data/recipes";
 
-export const saveRecipeToLocalStorage = (recipe: Recipe): void => {
-  try {
-    const savedRecipes = getSavedRecipesFromLocalStorage();
-    
-    // Check if recipe already exists in saved recipes
-    if (!savedRecipes.find(r => r.id === recipe.id)) {
-      savedRecipes.push(recipe);
-      localStorage.setItem('savedRecipes', JSON.stringify(savedRecipes));
-    }
-  } catch (error) {
-    console.error('Failed to save recipe to local storage:', error);
-  }
-};
+const USER_RECIPES_KEY = "user_recipes";
+const SAVED_RECIPES_KEY = "saved_recipes";
 
-export const removeSavedRecipeFromLocalStorage = (recipeId: string): void => {
-  try {
-    const savedRecipes = getSavedRecipesFromLocalStorage();
-    const updatedSavedRecipes = savedRecipes.filter(recipe => recipe.id !== recipeId);
-    localStorage.setItem('savedRecipes', JSON.stringify(updatedSavedRecipes));
-  } catch (error) {
-    console.error('Failed to remove recipe from local storage:', error);
-  }
-};
-
-export const getSavedRecipesFromLocalStorage = (): Recipe[] => {
-  try {
-    const savedRecipes = localStorage.getItem('savedRecipes');
-    return savedRecipes ? JSON.parse(savedRecipes) : [];
-  } catch (error) {
-    console.error('Failed to get saved recipes from local storage:', error);
-    return [];
-  }
-};
-
-export const saveUserRecipeToLocalStorage = (recipe: Recipe): void => {
-  try {
-    const userRecipes = getUserRecipesFromLocalStorage();
-    
-    // Create a new recipe with a unique ID
-    const newRecipe = {
-      ...recipe,
-      id: `user-${Date.now()}`
-    };
-    
-    userRecipes.push(newRecipe);
-    localStorage.setItem('userRecipes', JSON.stringify(userRecipes));
-    
-    return newRecipe;
-  } catch (error) {
-    console.error('Failed to save user recipe to local storage:', error);
-  }
-};
-
+// Get user-submitted recipes from localStorage
 export const getUserRecipesFromLocalStorage = (): Recipe[] => {
-  try {
-    const userRecipes = localStorage.getItem('userRecipes');
-    return userRecipes ? JSON.parse(userRecipes) : [];
-  } catch (error) {
-    console.error('Failed to get user recipes from local storage:', error);
-    return [];
+  const storedRecipes = localStorage.getItem(USER_RECIPES_KEY);
+  if (storedRecipes) {
+    return JSON.parse(storedRecipes);
+  }
+  return [];
+};
+
+// Save user-submitted recipe to localStorage
+export const saveUserRecipeToLocalStorage = (recipe: Omit<Recipe, "id">): Recipe => {
+  const userRecipes = getUserRecipesFromLocalStorage();
+  
+  // Create a new recipe with a unique ID
+  const newRecipe: Recipe = {
+    ...recipe,
+    id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+  };
+  
+  // Add to existing recipes
+  userRecipes.push(newRecipe);
+  
+  // Save back to localStorage
+  localStorage.setItem(USER_RECIPES_KEY, JSON.stringify(userRecipes));
+  
+  return newRecipe;
+};
+
+// Get saved (favorite) recipes from localStorage
+export const getSavedRecipesFromLocalStorage = (): Recipe[] => {
+  const savedRecipes = localStorage.getItem(SAVED_RECIPES_KEY);
+  if (savedRecipes) {
+    return JSON.parse(savedRecipes);
+  }
+  return [];
+};
+
+// Save recipe to favorites
+export const saveRecipeToFavorites = (recipe: Recipe): void => {
+  const savedRecipes = getSavedRecipesFromLocalStorage();
+  
+  // Check if already saved
+  const isAlreadySaved = savedRecipes.some(saved => saved.id === recipe.id);
+  
+  if (!isAlreadySaved) {
+    savedRecipes.push(recipe);
+    localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(savedRecipes));
   }
 };
 
-export const removeUserRecipeFromLocalStorage = (recipeId: string): void => {
-  try {
-    const userRecipes = getUserRecipesFromLocalStorage();
-    const updatedUserRecipes = userRecipes.filter(recipe => recipe.id !== recipeId);
-    localStorage.setItem('userRecipes', JSON.stringify(updatedUserRecipes));
-  } catch (error) {
-    console.error('Failed to remove user recipe from local storage:', error);
-  }
+// Remove recipe from favorites
+export const removeRecipeFromFavorites = (recipeId: string): void => {
+  const savedRecipes = getSavedRecipesFromLocalStorage();
+  const updatedRecipes = savedRecipes.filter(recipe => recipe.id !== recipeId);
+  localStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(updatedRecipes));
 };
 
+// Check if a recipe is saved to favorites
 export const isRecipeSaved = (recipeId: string): boolean => {
   const savedRecipes = getSavedRecipesFromLocalStorage();
   return savedRecipes.some(recipe => recipe.id === recipeId);
