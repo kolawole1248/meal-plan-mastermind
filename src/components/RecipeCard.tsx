@@ -2,7 +2,7 @@
 import React from 'react';
 import { Recipe } from '@/data/recipes';
 import { Heart, Clock } from 'lucide-react';
-import { isRecipeSaved, saveRecipeToLocalStorage, removeSavedRecipeFromLocalStorage } from '@/utils/localStorage';
+import { isRecipeSaved, saveRecipeToFavorites, removeRecipeFromFavorites } from '@/utils/localStorage';
 import { toast } from 'sonner';
 
 interface RecipeCardProps {
@@ -22,11 +22,11 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick, showSaveButton
     e.stopPropagation();
     
     if (isSaved) {
-      removeSavedRecipeFromLocalStorage(recipe.id);
+      removeRecipeFromFavorites(recipe.id);
       setIsSaved(false);
       toast.success('Recipe removed from saved recipes');
     } else {
-      saveRecipeToLocalStorage(recipe);
+      saveRecipeToFavorites(recipe);
       setIsSaved(true);
       toast.success('Recipe saved successfully');
     }
