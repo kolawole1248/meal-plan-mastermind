@@ -36,14 +36,15 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick, showSaveButton
   
   return (
     <div 
-      className="recipe-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg cursor-pointer"
+      className="recipe-card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg cursor-pointer transition-all duration-300"
       onClick={onClick}
     >
       <div className="relative h-48 overflow-hidden">
         <img 
           src={recipe.image} 
           alt={recipe.name} 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          loading="lazy"
         />
         <div className="absolute bottom-0 left-0 right-0 px-4 py-2 bg-gradient-to-t from-black/70 to-transparent">
           <div className="flex justify-between items-center">
