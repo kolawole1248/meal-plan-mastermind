@@ -24,7 +24,7 @@ const Home: React.FC = () => {
         // For now, we'll use sample data from the data/recipes.ts file
         // Later, you can replace this with your own API call
         const response = await import('@/data/recipes');
-        const recipeData = response.sampleRecipes;
+        const recipeData = response.initialRecipes; // Changed from sampleRecipes to initialRecipes
         
         // Simulate API delay
         setTimeout(() => {
@@ -138,9 +138,8 @@ const Home: React.FC = () => {
         
         <section className="mb-8">
           <CategoryFilter 
-            categories={recipeCategories} 
             selectedCategory={selectedCategory}
-            onSelectCategory={handleCategoryChange}
+            onCategoryChange={handleCategoryChange}
           />
         </section>
         
